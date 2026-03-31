@@ -273,7 +273,13 @@ def lookup_roblox(guild_id: int, roblox_username: str):
     a = roblox_coll.find_one({
         "roblox_username": roblox_username.lower().strip(),
         "guild_id": guild_id
+        
     })
     if not a:
         return {"found": False}
     return {"found": True, "discord_id": a.get("discord_id"), **_profile(a)}
+# This fixes the 405 error for UptimeRobot Free Tier
+@app.head("/")
+@app.get("/")
+def root():
+    return {"status": "AVA API online", "version": "3.0.0"}

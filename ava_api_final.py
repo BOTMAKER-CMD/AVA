@@ -825,3 +825,8 @@ def delete_account(discord_id: int, guild_id: int):
     sessions_coll.delete_many({"discord_id": discord_id})
     rate_coll.delete_one({"_id": str(discord_id)})
     return {"success": True}
+@app.get("/", methods=["GET", "HEAD"])
+def root():
+    # UptimeRobot will receive the 200 OK status 
+    # without downloading a large JSON body if it sends a HEAD request.
+    return {"status": "AVA API online", "version": "5.0.0"}

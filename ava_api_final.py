@@ -15,11 +15,12 @@ Changes from v4:
   • _svc() serialiser now includes notes, tags, due_date, source_guild_name
   • API key split: BOT_KEY (full access) vs PANEL_KEY (Lua — login + session only)
   • All DB writes use proper $push history entries
+  • HEAD /health added for UptimeRobot / monitoring probes
   • Version bump → 5.0.0
 ════════════════════════════════════════════════════════════
 """
 
-from fastapi import FastAPI, HTTPException, Header, Depends, Request
+from fastapi import FastAPI, HTTPException, Header, Depends, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, field_validator
 import pymongo
@@ -78,7 +79,7 @@ app = FastAPI(title="AVA API", version="5.0.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
-    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_methods=["GET", "POST", "HEAD", "OPTIONS"],
     allow_headers=["*"],
     allow_credentials=False,
 )
@@ -307,6 +308,11 @@ def root():
 def health():
     """Uptime check used by Railway / monitoring."""
     return {"ok": True, "ts": _now().isoformat()}
+
+@app.head("/health")
+def health_head():
+    """HEAD handler for UptimeRobot / monitoring probes."""
+    return Response(status_code=200)
 
 # ════════════════════════════════════════════════════════════
 #  ROUTES — Auth (PANEL_KEY gated)
